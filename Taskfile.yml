@@ -1,0 +1,26 @@
+version: '3'
+
+dotenv: ['../../.env', '../../.env.secrets', './.env', './.env.secrets', '{{.ENV}}/.env.', '{{.HOME}}/.env']
+
+vars:
+  PORT: 8080
+  LOGGING_ENABLED:
+    sh: ([[ "{{.LOGGING}}" == "true" ]] && echo "2>&1 | tee ../../logs/supabase.log" || echo "")  # ternary for enabling debugging in an
+
+tasks:
+
+  start:
+    desc: starts Supabase server
+    cmds:
+      - "cd ./docker && docker-compose -f ./docker-compose.yml up -d {{.LOGGING_ENABLED}}"
+
+  stop:
+    desc: stops Supabase server
+    cmds:
+      - "cd ./docker && docker-compose -f ./docker-compose.yml down {{.LOGGING_ENABLED}}"
+
+  restart:
+    desc: restarts Supabase server
+    cmds:
+      - task: stop
+      - task: start
